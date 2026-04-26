@@ -57,7 +57,8 @@ app.get("/api/session/:id/analytics", (req, res) => {
     ...(e.payloadJson ? JSON.parse(e.payloadJson) : {}),
   }));
   const aggregated = aggregateSession(events);
-  res.json({ sessionId, aggregated });
+  const friction = computeFriction(events, aggregated);
+  res.json({ sessionId, aggregated, friction });
 });
 
 app.post("/api/session/:id/submit", (req, res) => {

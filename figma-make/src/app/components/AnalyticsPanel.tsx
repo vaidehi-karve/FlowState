@@ -1,6 +1,8 @@
 import React from "react";
 import { Button } from "./ui/button";
 import { ScrollArea } from "./ui/scroll-area";
+import { Tooltip, TooltipContent, TooltipTrigger } from "./ui/tooltip";
+import { Info } from "lucide-react";
 
 type Props = {
   sessionId: string;
@@ -123,6 +125,7 @@ export function AnalyticsPanel({ sessionId, userId }: Props) {
       const r = await fetch(`/api/session/${sessionId}/analytics`);
       const j = await r.json();
       setAggregated(j.aggregated);
+      setFriction(j.friction);
     } catch {
       // ignore
     }
@@ -199,13 +202,13 @@ export function AnalyticsPanel({ sessionId, userId }: Props) {
   return (
     <aside
       data-analytics-panel
-      className="fixed right-0 top-0 h-screen w-[340px] sm:w-[360px] lg:w-[400px] xl:w-[420px] max-w-[90vw] border-l border-rose-200 bg-rose-50/80 backdrop-blur supports-[backdrop-filter]:bg-rose-50/60 z-50 font-[var(--dashboard-font)]"
+      className="fixed right-0 top-0 h-screen w-[340px] sm:w-[360px] lg:w-[400px] xl:w-[420px] max-w-[90vw] border-l border-rose-100 bg-gradient-to-b from-white via-rose-50/60 to-fuchsia-50/40 backdrop-blur supports-[backdrop-filter]:from-white/70 z-50 font-[var(--dashboard-font)]"
     >
       <div className="h-full flex flex-col">
-        <div className="p-4 border-b border-rose-200 bg-gradient-to-r from-rose-200/60 via-fuchsia-100/60 to-white/70">
+        <div className="p-4 border-b border-rose-100 bg-gradient-to-r from-rose-100/60 via-fuchsia-50/60 to-white/80">
           <div className="flex items-start justify-between gap-3">
             <div className="min-w-0">
-              <div className="text-sm font-semibold tracking-tight text-rose-950">FlowState</div>
+              <div className="text-sm font-semibold tracking-tight text-rose-900">Flow State</div>
               <div className="text-xs text-muted-foreground flex flex-wrap items-center gap-x-2 gap-y-1">
                 <span>Session:</span>
                 <span className="font-mono truncate max-w-[200px] sm:max-w-[240px] lg:max-w-[260px]">
@@ -221,7 +224,7 @@ export function AnalyticsPanel({ sessionId, userId }: Props) {
             <div className="flex flex-col items-end gap-2 shrink-0">
               {/* Toggle pill */}
               <div
-                className="inline-flex rounded-full border border-rose-200 bg-white/70 p-1 shadow-sm"
+                className="inline-flex rounded-full border border-rose-100 bg-white/80 p-1 shadow-sm"
                 role="tablist"
                 aria-label="Mode toggle"
               >
@@ -230,7 +233,7 @@ export function AnalyticsPanel({ sessionId, userId }: Props) {
                   role="tab"
                   aria-selected={mode === "tester"}
                   className={`px-3 py-1 text-xs rounded-full transition-colors ${
-                    mode === "tester" ? "bg-fuchsia-600 text-white" : "text-rose-950 hover:bg-rose-50"
+                    mode === "tester" ? "bg-fuchsia-500 text-white" : "text-rose-900 hover:bg-rose-50/60"
                   }`}
                   onClick={() => setMode("tester")}
                   data-track="mode_tester"
@@ -242,7 +245,7 @@ export function AnalyticsPanel({ sessionId, userId }: Props) {
                   role="tab"
                   aria-selected={mode === "pm"}
                   className={`px-3 py-1 text-xs rounded-full transition-colors ${
-                    mode === "pm" ? "bg-fuchsia-600 text-white" : "text-rose-950 hover:bg-rose-50"
+                    mode === "pm" ? "bg-fuchsia-500 text-white" : "text-rose-900 hover:bg-rose-50/60"
                   }`}
                   onClick={() => {
                     setMode("pm");
@@ -256,7 +259,7 @@ export function AnalyticsPanel({ sessionId, userId }: Props) {
 
               {/* Action button */}
               {mode === "tester" ? (
-                <div className="text-xs text-rose-950/80 px-2 py-1">
+                <div className="text-xs text-rose-900/80 px-2 py-1">
                   Tester mode
                 </div>
               ) : (
@@ -264,7 +267,7 @@ export function AnalyticsPanel({ sessionId, userId }: Props) {
                   onClick={runPmAnalyze}
                   disabled={pmRunning}
                   data-track="pm_run_ai"
-                  className="bg-fuchsia-600 hover:bg-fuchsia-700 text-white h-9 px-3 text-sm"
+                  className="bg-fuchsia-500 hover:bg-fuchsia-600 text-white h-9 px-3 text-sm shadow-sm"
                 >
                   {pmRunning ? "Analyzing…" : "Run AI"}
                 </Button>
@@ -374,7 +377,27 @@ export function AnalyticsPanel({ sessionId, userId }: Props) {
               <>
             <div className="grid grid-cols-2 gap-3">
               <div className="rounded-lg border border-rose-200 bg-white p-3 shadow-sm">
-                <div className="text-xs text-muted-foreground">Friction score</div>
+                <div className="text-xs text-muted-foreground flex items-center gap-1.5">
+                  <span>Friction score</span>
+                  <Tooltip>
+                    <TooltipTrigger asChild>
+                      <button
+                        type="button"
+                        className="inline-flex items-center justify-center rounded hover:bg-rose-50 p-1"
+                        aria-label="How friction score is calculated"
+                        data-track="friction_info"
+                      >
+                        <Info className="w-3.5 h-3.5" />
+                      </button>
+                    </TooltipTrigger>
+                    <TooltipContent
+                      sideOffset={6}
+                      className="max-w-[320px] whitespace-pre-wrap bg-gradient-to-br from-rose-50 via-fuchsia-50 to-white text-rose-950 border border-rose-100 shadow-md"
+                    >
+                      {`0–10 score based on behavior signals:\n\n+2 repeated clicks (any element ≥ 3 clicks)\n+2 long idle gap (≥ 20s between events)\n+1 backtracking (A→B→A nav)\n+1 low engagement (< 4 clicks over > 20s)\n+2 slow first action (> 10s to first click/nav)\n\nHigh friction: score ≥ 4`}
+                    </TooltipContent>
+                  </Tooltip>
+                </div>
                 <div className="text-2xl font-semibold">{frictionScore ?? "—"}</div>
               </div>
               <div className="rounded-lg border border-rose-200 bg-white p-3 shadow-sm">
