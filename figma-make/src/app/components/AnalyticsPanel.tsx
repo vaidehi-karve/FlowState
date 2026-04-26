@@ -147,12 +147,12 @@ export function AnalyticsPanel({ sessionId }: Props) {
   return (
     <aside
       data-analytics-panel
-      className="fixed right-0 top-0 h-screen w-[340px] sm:w-[360px] lg:w-[400px] xl:w-[420px] max-w-[90vw] border-l bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/80 z-50"
+      className="fixed right-0 top-0 h-screen w-[340px] sm:w-[360px] lg:w-[400px] xl:w-[420px] max-w-[90vw] border-l border-pink-200 bg-pink-50/80 backdrop-blur supports-[backdrop-filter]:bg-pink-50/60 z-50 font-[var(--dashboard-font)]"
     >
       <div className="h-full flex flex-col">
-        <div className="p-4 border-b flex items-center justify-between gap-3">
+        <div className="p-4 border-b border-pink-200 bg-gradient-to-r from-pink-200/60 via-pink-100/60 to-white/70 flex items-center justify-between gap-3">
           <div>
-            <div className="text-sm font-medium">Analytics + AI Insights</div>
+            <div className="text-sm font-semibold tracking-tight text-pink-950">UI/UX Analytics</div>
             <div className="text-xs text-muted-foreground">
               Session: <span className="font-mono">{sessionId}</span> •{" "}
               <span className={connected ? "text-green-600" : "text-red-600"}>
@@ -160,18 +160,23 @@ export function AnalyticsPanel({ sessionId }: Props) {
               </span>
             </div>
           </div>
-          <Button onClick={runAnalyze} disabled={running} data-track="analytics_run_ai">
+          <Button
+            onClick={runAnalyze}
+            disabled={running}
+            data-track="analytics_run_ai"
+            className="bg-pink-600 hover:bg-pink-700 text-white"
+          >
             {running ? "Analyzing…" : "Run AI Analysis"}
           </Button>
         </div>
 
         <ScrollArea className="flex-1 min-h-0 overflow-hidden">
           <div className="p-4 space-y-4 overflow-x-hidden">
-            <div className="rounded border">
-              <div className="px-3 py-2 border-b text-sm font-medium flex items-center justify-between gap-3">
+            <div className="rounded-xl border-2 border-pink-400 bg-gradient-to-br from-pink-100/80 via-white to-white shadow-md">
+              <div className="px-3 py-2 border-b border-pink-200 bg-pink-200/40 text-sm font-semibold flex items-center justify-between gap-3">
                 <span>{betaTask.title}</span>
                 <button
-                  className="text-xs px-2 py-1 rounded border hover:bg-muted shrink-0"
+                  className="text-xs px-2 py-1 rounded border border-pink-200 bg-white hover:bg-pink-50 shrink-0"
                   onClick={() => {
                     setTaskId((cur) => pickDifferentTaskId(tasks.map((t) => t.id), cur));
                     setTaskDone(false);
@@ -182,10 +187,16 @@ export function AnalyticsPanel({ sessionId }: Props) {
                 </button>
               </div>
               <div className="p-3">
-                <div className="text-sm">{betaTask.description}</div>
-                <div className="text-xs text-muted-foreground mt-1">
+                <div className="text-sm font-medium text-pink-950">{betaTask.description}</div>
+                <div className="text-xs text-muted-foreground mt-2 flex items-center gap-2">
                   Status:{" "}
-                  <span className={taskDone ? "text-green-600" : "text-muted-foreground"}>
+                  <span
+                    className={
+                      taskDone
+                        ? "px-2 py-0.5 rounded-full bg-green-100 text-green-700 font-medium"
+                        : "px-2 py-0.5 rounded-full bg-pink-100 text-pink-800 font-medium"
+                    }
+                  >
                     {taskDone ? "completed" : "in progress"}
                   </span>
                 </div>
@@ -193,11 +204,11 @@ export function AnalyticsPanel({ sessionId }: Props) {
             </div>
 
             <div className="grid grid-cols-2 gap-3">
-              <div className="rounded border p-3">
+              <div className="rounded-lg border border-pink-200 bg-white p-3 shadow-sm">
                 <div className="text-xs text-muted-foreground">Friction score</div>
                 <div className="text-2xl font-semibold">{frictionScore ?? "—"}</div>
               </div>
-              <div className="rounded border p-3">
+              <div className="rounded-lg border border-pink-200 bg-white p-3 shadow-sm">
                 <div className="text-xs text-muted-foreground">Nav path</div>
                 <div className="text-xs mt-1 break-words overflow-hidden">
                   {navPath.length ? navPath.join(" → ") : "—"}
@@ -205,8 +216,8 @@ export function AnalyticsPanel({ sessionId }: Props) {
               </div>
             </div>
 
-            <div className="rounded border">
-              <div className="px-3 py-2 border-b text-sm font-medium">Top clicked</div>
+            <div className="rounded-lg border border-pink-200 bg-white shadow-sm">
+              <div className="px-3 py-2 border-b border-pink-200 bg-pink-100/60 text-sm font-semibold">Top clicked</div>
               <div className="p-3 space-y-1">
                 {top.length ? (
                   top.slice(0, 10).map((t: any) => (
@@ -221,8 +232,8 @@ export function AnalyticsPanel({ sessionId }: Props) {
               </div>
             </div>
 
-            <div className="rounded border">
-              <div className="px-3 py-2 border-b text-sm font-medium">AI recommendations</div>
+            <div className="rounded-lg border border-pink-200 bg-white shadow-sm">
+              <div className="px-3 py-2 border-b border-pink-200 bg-pink-100/60 text-sm font-semibold">AI recommendations</div>
               <div className="p-3">
                 {analysis?.error ? (
                   <div className="text-xs text-red-600 break-words whitespace-pre-wrap">
@@ -231,9 +242,9 @@ export function AnalyticsPanel({ sessionId }: Props) {
                 ) : analysis?.recommendations?.length ? (
                   <div className="space-y-3">
                     {analysis.recommendations.map((r: any, idx: number) => (
-                      <div key={idx} className="rounded border p-3">
-                        <div className="text-xs text-muted-foreground">{r.priority ?? "P?"}</div>
-                        <div className="text-sm font-medium">{r.title}</div>
+                      <div key={idx} className="rounded-lg border border-pink-200 bg-pink-50/60 p-3">
+                        <div className="text-xs text-muted-foreground font-medium">{r.priority ?? "P?"}</div>
+                        <div className="text-sm font-semibold">{r.title}</div>
                         {r.why ? <div className="text-xs mt-1 text-muted-foreground">{r.why}</div> : null}
                         {r.how ? <div className="text-xs mt-1">{r.how}</div> : null}
                       </div>
@@ -247,8 +258,8 @@ export function AnalyticsPanel({ sessionId }: Props) {
               </div>
             </div>
 
-            <div className="rounded border">
-              <div className="px-3 py-2 border-b text-sm font-medium">Live event stream</div>
+            <div className="rounded-lg border border-pink-200 bg-white shadow-sm">
+              <div className="px-3 py-2 border-b border-pink-200 bg-pink-100/60 text-sm font-semibold">Live event stream</div>
               <div className="p-3 space-y-2">
                 {events.length ? (
                   events
@@ -256,7 +267,7 @@ export function AnalyticsPanel({ sessionId }: Props) {
                     .reverse()
                     .slice(0, 120)
                     .map((e, idx) => (
-                      <div key={idx} className="text-xs break-words whitespace-normal">
+                      <div key={idx} className="text-xs break-words whitespace-normal rounded px-2 py-1 hover:bg-pink-50">
                         <span className="font-mono text-muted-foreground">
                           {new Date(e.timestamp).toLocaleTimeString()}
                         </span>{" "}
