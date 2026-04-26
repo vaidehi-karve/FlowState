@@ -205,7 +205,7 @@ export function AnalyticsPanel({ sessionId, userId }: Props) {
         <div className="p-4 border-b border-rose-200 bg-gradient-to-r from-rose-200/60 via-fuchsia-100/60 to-white/70">
           <div className="flex items-start justify-between gap-3">
             <div className="min-w-0">
-              <div className="text-sm font-semibold tracking-tight text-rose-950">UI/UX Analytics</div>
+              <div className="text-sm font-semibold tracking-tight text-rose-950">FlowState</div>
               <div className="text-xs text-muted-foreground flex flex-wrap items-center gap-x-2 gap-y-1">
                 <span>Session:</span>
                 <span className="font-mono truncate max-w-[200px] sm:max-w-[240px] lg:max-w-[260px]">
